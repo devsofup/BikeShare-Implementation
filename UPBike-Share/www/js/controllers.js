@@ -37,37 +37,31 @@ SOFTWARE.
 
 Code History:
 
-April 14, 2016 - Jaypee San Gabriel
-->Added Backand Dependency + Configurations
 May 12, 2016 - Jaypee San Gabriel
-->Changed AngularJS structure
+->Base controllers for log-in page and home page
 
 --> */
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('BikeShare', ['ionic','backand','BikeShare.controllers','BikeShare.services'])
+angular.module('BikeShare.controllers', ['BikeShare.services'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-      // for form inputs)
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    .controller('LoginCtrl', function ($scope, DatabaseService) {
+		$scope.users=[];
+		
+		function getusers() {
+			DatabaseService.readall(users)
+			.then(function(result){
+				$scope.users=data;
+			});
+        }
+    })
 
-      // Don't remove this line unless you know what you are doing. It stops the viewport
-      // from snapping when text inputs are focused. Ionic handles this internally for
-      // a much nicer keyboard experience.
-      cordova.plugins.Keyboard.disableScroll(true);
-    }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+    .controller('HomeCtrl', function ($scope, BikeDataService) {
+		$scope.bikes=[];
+		
+		function getbikesbystation(stationName) {
+			BikeDataService.readbystation(stationName)
+			.then(function(result){
+				$scope.bikes=data;
+			});
+        }
+	});
 
-.config(function (BackandProvider) {
-  BackandProvider.setAppName('bikeshareapi');
-  BackandProvider.setAnonymousToken('934f414c-21a4-4bd1-abba-16b188853903');
-})
-	

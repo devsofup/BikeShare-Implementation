@@ -39,35 +39,65 @@ Code History:
 
 April 14, 2016 - Jaypee San Gabriel
 ->Added Backand Dependency + Configurations
-May 12, 2016 - Jaypee San Gabriel
-->Changed AngularJS structure
+->Added general Database Service
 
 --> */
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('BikeShare', ['ionic','backand','BikeShare.controllers','BikeShare.services'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-      // for form inputs)
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+angular.module('BikeShare.services', [])
 
-      // Don't remove this line unless you know what you are doing. It stops the viewport
-      // from snapping when text inputs are focused. Ionic handles this internally for
-      // a much nicer keyboard experience.
-      cordova.plugins.Keyboard.disableScroll(true);
-    }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+	/*
+Database Service
+April 14, 2016
+This service is for obtaining data from the Backand database.
+The code is obtained from: <no author>. Backand Documentation. Last accessed: April 14, 2016 
+*/
+	.service('DatabaseService', function($http, Backand){    
 
-.config(function (BackandProvider) {
-  BackandProvider.setAppName('bikeshareapi');
-  BackandProvider.setAnonymousToken('934f414c-21a4-4bd1-abba-16b188853903');
-})
+		 var baseUrl = '/1/objects/';
+
+		 return {
+
+			  // read all rows in the object
+			  readAll: function(objectName) {  
+			  return $http({
+				   method: 'GET',
+				   url: Backand.getApiUrl() + baseUrl + objectName
+			  }).then(
+				   function(response) {
+						return response.data.data;
+				   });
+			  },
+
+			  // read one row with given id
+			  readOne: function(objectName, id) {
+			  return $http({
+				   method: 'GET',
+				   url: Backand.getApiUrl() + baseUrl + self.objectName 
+				   + '/' + id
+			  }).then(
+				   function(response) {
+				   return response.data;
+				   });
+			  }
+		 };
+	})
 	
+	.service('BikeDataService', function($http, Backand) {
+		
+		var baseUrl='/1/objects/';
+		return {
+			readbystation: function(stationName) {
+			return $http({
+				method: 'GET',
+				url: Backand.getApiUrl() + baseUrl + 'bikes'
+				params: {
+					state: 'Available',
+					location: stationName
+				}
+				}).then(
+					function(response) {
+						return response.data.data;
+					});
+			}					
+		};
+	});
