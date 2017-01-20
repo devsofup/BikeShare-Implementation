@@ -46,17 +46,16 @@ March 16, 2016 - Mark Anton Mamac
 ->Script for popup animation
 ->Template for scripts
 
-April 14, 2016 - Jaypee San Gabriel
-->Added Backand Dependency
+October 10, 2016 - Jaypee San Gabriel
+->Fixed login function to actually check for username and password combinations.
+->Added code to transfer user data between pages.
 
 -->
 
 <html>
      <head>
-	      <script src="lib/angularbknd-sdk/dist/backand.min.js"></script>
           <title>Login Screen</title>
           <script>
-
                /*
                check() Function
                March 16, 2016
@@ -82,25 +81,34 @@ April 14, 2016 - Jaypee San Gabriel
                */
 
                function login(usr, pass){
+			        var users = [
+			             {"username":"gepree", "password":"blazedge"},
+					     {"username":"eria", "password":"haven"},
+			             {"username":"astraea", "password":"blackblood"},
+                    ];
                     /*username input from the user*/
                     var usr=document.getElementById("username").value;
                     /*password input from the user*/
                     var pass=document.getElementById("password").value;
-                    /*hardcoded, please modify this part*/
-                    if(usr.localeCompare("upbikeshare")==0 && pass.localeCompare("password")==0){
-                         alert("Login successful!");
-                         location.href="home.html";
-                    }
+					var objectCount = users.length;
+					for (var i=0; i < objectCount; i++){
+					
+                         if(usr.localeCompare(users[i].username)==0 && pass.localeCompare(users[i].password)==0){
+                              alert("Login successful!");
+							  localStorage.setItem("username",usr);
+							  localStorage.setItem("reserved","None");
+                              location.href="home.html";
+							  return true;
+                         }
 
-                    else{
-                         alert("Incorrect username and password combination!");
-                    }
-
+                         
+					}
+					alert("Incorrect username and password combination!");
                     return false;
                }
           </script>
      </head>
-     <body ng-app="BikeShare" onload="check()">
+     <body onload="check()">
           <!--ionic css for preset designs-->
           <!--<link href="lib/ionic/css/ionic.css" rel="stylesheet">-->
 

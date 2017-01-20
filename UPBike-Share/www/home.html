@@ -57,7 +57,38 @@ March 26, 2016 - Mark Anton Mamac
      <head>
           <title>Home Screen</title>
           <script>
-               /*
+		       var users = [
+			        {"username":"gepree", "password":"blazedge"},
+					{"username":"eria", "password":"haven"},
+			        {"username":"astraea", "password":"blackblood"},
+               ];
+			   var bikes = [
+			        {"id":"1","state":"Available", "location":"Vinzon's"},
+					{"id":"2","state":"Available", "location":"Eng'g Lib 2"},
+			        {"id":"3","state":"Available", "location":"Eng'g Lib 2"},
+               ];
+			   var ongoingshares = [
+			        {"user":"gepree", "bike":"2"}
+               ];
+			   var currentUser=localStorage.getItem("username");
+			   var reservedStation=localStorage.getItem("reserved");
+			   var objectCount = users.length;
+			   for (var i=0; i < objectCount; i++){
+			        if (currentUser.localeCompare(users[i].username)==0){
+					     currentUser=users[i];
+						 break;
+				    }
+			   }
+               objectCount = ongoingshares.length;
+			   for (i=0; i < objectCount; i++){
+					if (currentUser.username.localeCompare(ongoingshares[i].user)==0){
+						 reservedStation="Ongoing";
+						 localStorage.setItem("reserved",reservedStation);
+						 localStorage.setItem("bikenumber",ongoingshares[i].bike);
+						 break;
+					}
+				}
+                /*
                iconClick() function
                March 16 2016
 
@@ -65,30 +96,37 @@ March 26, 2016 - Mark Anton Mamac
                */
                function iconClick(icon){
                     /*get the number of bikes available from the database*/
-                    /*
-                    var availableBike=...
+					var availableBike=0;
+					var objectCount = bikes.length;
+			        for (var i=0; i < objectCount; i++){
+					     if (icon.name.localeCompare(bikes[i].location)==0){
+						      availableBike++;
+						 }
+					}
                     var bikeNumber=document.getElementById("bikeNumber");
                     bikeNumber.innerHTML=availableBike;
-                    */
-
-
+					
                     /*If there is no reserved bike show the reservation popup*/
                     /*change the station name based on the clicked icon*/
-                    
-                    var stationName=document.getElementById("rpopUpStationName");
-                    stationName.innerHTML=icon.name;
-                    document.getElementById("reservePopUp").className="popUp homePopUp changeOpacity1";
-                    document.getElementById("reservePopUp").style.pointerEvents="auto";
-                    
+				
+                    if (reservedStation.localeCompare("None")==0){					
+                         var stationName=document.getElementById("rpopUpStationName");
+                         stationName.innerHTML=icon.name;
+					     document.getElementById("reservePopUp").popUpStationName=icon.name;
+                         document.getElementById("reservePopUp").className="popUp homePopUp changeOpacity1";
+                         document.getElementById("reservePopUp").style.pointerEvents="auto";
+                    }
+					else {
 
                     /*Else if there is a reserved bike but the destination is not yet locked, show the destination popup*/
                     /*change the station name based on the clicked icon*/
-                    /*
-                    var stationName=document.getElementById("dpopUpStationName");
-                    stationName.innerHTML=icon.name;
-                    document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity1";
-                    document.getElementById("destinationPopUp").style.pointerEvents="auto";
-                    */
+                    
+                         var stationName=document.getElementById("dpopUpStationName");
+                         stationName.innerHTML=icon.name;
+					     document.getElementById("destinationPopUp").popUpStationName=icon.name;
+                         document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity1";
+                         document.getElementById("destinationPopUp").style.pointerEvents="auto";
+                    }
                }
 
                /*
@@ -100,10 +138,19 @@ March 26, 2016 - Mark Anton Mamac
                function reserve(){
                     /*station name*/
                     var stationName=document.getElementById("reservePopUp").popUpStationName;
-                    /*insert reservation code here*/
-
+                    reservedStation=stationName;
+                    localStorage.setItem("reserved",reservedStation);
+					
+					var objectCount=bikes.length;
+                    for (var i=0; i < objectCount; i++){
+			             if (stationName.localeCompare(bikes[i].location)==0){
+					          localStorage.setItem("bikenumber",bikes[i].id);
+						      break;
+				         }
+			        }
                     /*hide reserve popup*/
                     document.getElementById("reservePopUp").className="popUp homePopUp changeOpacity0";
+					document.getElementById("reservePopUp").style.pointerEvents="none";
                }
 
                /*
@@ -127,7 +174,18 @@ March 26, 2016 - Mark Anton Mamac
                function lock(){
                     /*station name*/
                     var stationName=document.getElementById("destinationPopUp").popUpStationName;
-
+					var objectCount = bikes.length;
+			        for (var i=0; i < objectCount; i++){
+					     if (reservedStation.localeCompare(bikes[i].location)==0){
+						      break;
+						 }
+					}
+					var lockedReservation=new share(currentUser.username,bikes[i].id);
+					ongoingshares.push(lockedReservation);
+					var objectCount = ongoingshares.length;
+					for (var i=0; i < objectCount; i++){
+					     alert(ongoingshares[i].user);
+					}
                     /*insert lock code here*/
 
                     /*hide reserve popup*/
@@ -145,6 +203,27 @@ March 26, 2016 - Mark Anton Mamac
                     document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity0";
                     document.getElementById("destinationPopUp").style.pointerEvents="none";
                }
+			   
+			   function share(user,bike) {
+			        this.user=user;
+					this.bike=bike;
+			   }
+			   
+			   /* check_reservation() function
+			   November 06,2016
+			   
+			   Check for the reservation state of the user.
+			   */
+			   /*function check_reservation(){
+					var reservedState;
+			        var objectCount = ongoingshares.length;
+			        for (var i=0; i < objectCount; i++){
+					     if (currentUser.username.localeCompare(ongoingshares[i].user)==0){
+						      reservedState=2;
+					     }
+					}
+					return reservedState;
+			   }*/
           </script>
      </head>
      <body>
@@ -169,9 +248,9 @@ March 26, 2016 - Mark Anton Mamac
                     <!--CHK station icon-->
                     <img src="img/stationIcon.png" name="CHK" alt="CHK Station" class="stationIcon chkIcon" onclick="iconClick(this)">
                     <!--Engg station icon-->
-                    <img src="img/stationIcon.png" name="Engg" alt="Engg Station" class="stationIcon enggIcon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Eng'g" alt="Engg Station" class="stationIcon enggIcon" onclick="iconClick(this)">
                     <!--EnggLib2 station icon-->
-                    <img src="img/stationIcon.png" name="EnggLib2" alt="EnggLib2 Station" class="stationIcon enggLib2Icon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Eng'g Lib 2" alt="EnggLib2 Station" class="stationIcon enggLib2Icon" onclick="iconClick(this)">
                     <!--Fine Arts station icon-->
                     <img src="img/stationIcon.png" name="Fine Arts" alt="Fine Arts Station" class="stationIcon fineArtsIcon" onclick="iconClick(this)">
                     <!--Marine Science station icon-->
@@ -191,7 +270,7 @@ March 26, 2016 - Mark Anton Mamac
                     <!--Shopping Center station icon-->
                     <img src="img/stationIcon.png" name="Shopping Center" alt="Shopping Center Station" class="stationIcon shoppingCenterIcon" onclick="iconClick(this)">
                     <!--Vinzon's Hall station icon-->
-                    <img src="img/stationIcon.png" name="Vinzons" alt="Vinzon's Station" class="stationIcon vinzonIcon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Vinzon's" alt="Vinzon's Station" class="stationIcon vinzonIcon" onclick="iconClick(this)">
                </div>
 
                <!--Menu bar-->
