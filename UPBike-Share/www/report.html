@@ -57,8 +57,16 @@ March 18, 2016 - Mark Anton Mamac
 <html>
      <head>
           <title>Report Screen</title>
+		  <script src="lib/angular/angular.js"></script>
+          <script src="lib/ionic/js/ionic.js"></script>
+          <script src="lib/angular-animate/angular-animate.js"></script>
+          <script src="lib/angular-sanitize/angular-sanitize.js"></script>
+          <script src="lib/angular-ui-router/release/angular-ui-router.js"></script>
+          <script src="lib/ionic/js/ionic-angular.js"></script>
+	      <script src="js/app.js"></script>
           <script>
-               var currentUser=localStorage.getItem("username");
+               var currentUser=localStorage.getItem("currentuser");
+			   currentUser=JSON.parse(currentUser);
                /*
                submit() function
                March 16, 2016
@@ -68,10 +76,15 @@ March 18, 2016 - Mark Anton Mamac
                function submit(){
                     var bikeNumber=document.getElementById("bikeNumber").value;
                     var issue=document.getElementById("issue").value;
+					//var data_promise=angular.injector(['ng','BikeShare']).get('Database').postReport();
+					var dataPromise=angular.element(document.body).injector().get('Database').postReport(currentUser.userID,bikeNumber,issue);
+					//var data_promise=angular.element(document.getElementById('BikeShare')).injector().get('Database').postReport();
+					dataPromise.then(function(response){alert("Report successfully submitted.")},function(response){alert('Unable to connect. Please check your connection.')});
                     /*submit this values*/
                }
           </script>
      </head>
+	 <body ng-app="BikeShare"></body>
      <body>
           <!--ionic css for preset designs-->
           <!--<link href="lib/ionic/css/ionic.css" rel="stylesheet">-->

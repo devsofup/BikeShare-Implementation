@@ -46,7 +46,7 @@ May 12, 2016 - Jaypee San Gabriel
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('BikeShare', ['ionic','backand','BikeShare.controllers','BikeShare.services'])
+angular.module('BikeShare', ['ionic'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -66,8 +66,77 @@ angular.module('BikeShare', ['ionic','backand','BikeShare.controllers','BikeShar
   });
 })
 
-.config(function (BackandProvider) {
-  BackandProvider.setAppName('bikeshareapi');
-  BackandProvider.setAnonymousToken('934f414c-21a4-4bd1-abba-16b188853903');
+.factory('Database', function($http) {
+     var users=[];
+	 var getUsers=function(){
+               return $http.get('http://localhost:8000/bikeshare/get_user.php');
+     };
+	 
+	 var getBikes=function(){
+               return $http.get('http://localhost:8000/bikeshare/get_bikes.php');
+     };
+	 
+	 var checkOngoing=function(userid){
+	      var url='http://localhost:8000/bikeshare/check_ongoing.php';
+		  var data={"userid":userid.toString()};
+	      return $http.post(url,data);
+     };
+	 
+	 var postOngoing=function(userid,bikeNumber){
+	      var url='http://localhost:8000/bikeshare/post_ongoing.php';
+		  var data={"userid":userid.toString(),"bikeNumber":bikeNumber.toString()};
+	      return $http.post(url,data);
+     };
+	 
+	 /*var postReport=function(){
+	           alert('!!!');
+               return $http.get('http://localhost:8000/bikeshare/trypost.php');
+     };*/
+	 
+     var postReport=function(userid,bikeNumber,issue){
+	      var url='http://localhost:8000/bikeshare/post_report.php';
+		  var data={"userid":userid.toString(),"bikeNumber":bikeNumber,"issue":issue};
+	      return $http.post(url,data);
+		  /*return $http({
+		       method: 'POST',
+		       url:'http://localhost:8000/bikeshare/trypost.php',
+		       data{'message':'abc'}
+		       })
+		       .then(function(response){alert('yay')},function(response){alert('nop')});*/
+	 };
+	 
+	 var deleteOngoing=function(userid){
+	      var url='http://localhost:8000/bikeshare/delete_ongoing.php';
+		  var data={"userid":userid.toString()};
+	      return $http.post(url,data);
+     };
+	 
+     return {
+	      getUsers:getUsers,
+		  getBikes:getBikes,
+		  checkOngoing:checkOngoing,
+		  postOngoing:postOngoing,
+		  postReport:postReport,
+		  deleteOngoing:deleteOngoing
+          /*getUsers: function(){
+               return $http.get('http://localhost:8000/bikeshare/get_user.php');
+          }*/
+		  /*postReport: function(){
+		       return $http({
+			        method: 'POST',
+					url:'http://localhost:8000/bikeshare/trypost.php',
+					data{'message':'abc'}
+					})
+					.then(function(response){alert('yay')},function(response){alert('nop')});
+          }*/
+     };
 })
-	
+
+.controller('LoginCtrl', function($scope, Users){
+     $scope.users=[];
+     Users.getUsers().then(function(response){
+          $scope.users=response;
+     }).catch(function(response){
+          alert('error');
+     });
+});

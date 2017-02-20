@@ -48,38 +48,59 @@ March 26, 2016 - Mark Anton Mamac
 <html>
      <head>
           <title>User Status Screen</title>
+		  <script src="lib/angular/angular.js"></script>
+          <script src="lib/ionic/js/ionic.js"></script>
+          <script src="lib/angular-animate/angular-animate.js"></script>
+          <script src="lib/angular-sanitize/angular-sanitize.js"></script>
+          <script src="lib/angular-ui-router/release/angular-ui-router.js"></script>
+          <script src="lib/ionic/js/ionic-angular.js"></script>
+	      <script src="js/app.js"></script>
           <script>
-		  var currentUser=localStorage.getItem("username");
+		  var currentUser=localStorage.getItem("currentuser");
+		  currentUser=JSON.parse(currentUser);
           function display(){
-               reservedStation=localStorage.getItem("reserved");
-			   alert(localStorage.getItem("bikenumber"));
                /*if there is no reservation*/
-			   if (reservedStation.localeCompare("None")==0){
+			   if (currentUser.reservedstate.localeCompare("None")==0){
 
                document.getElementById("notReserved").className="changeOpacity1";
                document.getElementById("notReserved").style.pointerEvents="auto";
 			   }
 
                /*else if there is reservation*/
-			   else if (reservedStation.localeCompare("None")!=0)
+			   else if (currentUser.reservedstate.localeCompare("GetDestination")==0) {
                //show div reserved
                document.getElementById("reserved").className="changeOpacity1";
                document.getElementById("reserved").style.pointerEvents="auto";
 
                //display route based on reservation
                //sample value only
-               document.getElementById("rRoute").innerHTML="Vinzons - EnggLib2";
-               
+			   document.getElementById("rbikeNum").innerHTML=currentUser.bikenumber;
+               document.getElementById("rRoute").innerHTML=currentUser.reservestation;
+			   }
+			   
+			   else if (currentUser.reservedstate.localeCompare("DestinationSet")==0){
+			   
+			   document.getElementById("reserved").className="changeOpacity1";
+               document.getElementById("reserved").style.pointerEvents="auto";
 
-               /*else if unlocked
+               //display route based on reservation
+               //sample value only
+			   document.getElementById("rbikeNum").innerHTML=currentUser.bikenumber;
+               document.getElementById("rRoute").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
+			   
+			   }
+			   
+			   else if (currentUser.reservedstate.localeCompare("Ongoing")==0){
                //show div unlocked
                document.getElementById("unlocked").className="changeOpacity1";
                document.getElementById("unlocked").style.pointerEvents="auto";
 
                //display route based on reservation
                //sample value only
-               document.getElementById("route").innerHTML="Vinzons - EnggLib2";
-               */
+			   document.getElementById("ubikeNum").innerHTML=currentUser.bikenumber;
+               document.getElementById("route").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
+			   }
+               
           }
 
           function unlock(){
@@ -93,30 +114,59 @@ March 26, 2016 - Mark Anton Mamac
 
                //display route based on reservation
                //sample value only
-               document.getElementById("uRoute").innerHTML="Vinzons - EnggLib2";
+               document.getElementById("uRoute").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
+			   
+			   currentUser.reservedstate="Ongoing";
+			   localStorage.setItem("currentuser",JSON.stringify(currentUser));
           }
 
           function cancelReserve(){
-               //hide div reserved
-               document.getElementById("reserved").className="changeOpacity0";
-               document.getElementById("reserved").style.pointerEvents="none";
+			   var dataPromise=angular.element(document.body).injector().get('Database').deleteOngoing(currentUser.userID);
+			   dataPromise.then(function(result){
+			        //hide div reserved
+                    document.getElementById("reserved").className="changeOpacity0";
+                    document.getElementById("reserved").style.pointerEvents="none";
 
-               //show div notReserved
-               document.getElementById("notReserved").className="changeOpacity1";
-               document.getElementById("notReserved").style.pointerEvents="auto";
+                    //show div notReserved
+                    document.getElementById("notReserved").className="changeOpacity1";
+                    document.getElementById("notReserved").style.pointerEvents="auto";
+			   
+			        currentUser.reservedstate="None";
+			        currentUser.reservestation="None";
+			        currentUser.destination="None";
+			        localStorage.setItem("currentuser",JSON.stringify(currentUser));
+			   },
+			   function(result){
+					alert('Unable to connect. Please check your connection.')
+			   });
           }
 
           function lock(){
-               //hide div unlocked
-               document.getElementById("unlocked").className="changeOpacity0";
-               document.getElementById("unlocked").style.pointerEvents="none";
+			   
+			   /* delete ongoing share */
+			   var dataPromise=angular.element(document.body).injector().get('Database').deleteOngoing(currentUser.userID);
+			   dataPromise.then(function(result){
+					//hide div unlocked
+                    document.getElementById("unlocked").className="changeOpacity0";
+                    document.getElementById("unlocked").style.pointerEvents="none";
 
                //show div reserved
-               document.getElementById("notReserved").className="changeOpacity1";
-               document.getElementById("notReserved").style.pointerEvents="auto";
+                    document.getElementById("notReserved").className="changeOpacity1";
+                    document.getElementById("notReserved").style.pointerEvents="auto";
+			   
+			   /* delete ongoing share */
+			        currentUser.reservedstate="None";
+			        currentUser.reservestation="None";
+			        currentUser.destination="None";
+			        localStorage.setItem("currentuser",JSON.stringify(currentUser));
+			   },
+			   function(result){
+					alert('Unable to connect. Please check your connection.')
+			   });
           }
           </script>
      </head>
+	 <body ng-app="BikeShare"></body>
      <body onload="display()">
           <!--ionic css for preset designs-->
           <!--<link href="lib/ionic/css/ionic.css" rel="stylesheet">-->
@@ -134,7 +184,7 @@ March 26, 2016 - Mark Anton Mamac
                <!--With bike reservation-->
                <div class="status" id="reserved">
                     <!--Bike Number-->
-                    <p class="pNoMargin bikeNumber">0</p>
+                    <p class="pNoMargin bikeNumber" id="rbikeNum"></p>
                     <!--Bike Number text-->
                     <p class="pNoMargin bikeNumberText">Bike Number</p>
                     <!--Route-->
@@ -147,7 +197,7 @@ March 26, 2016 - Mark Anton Mamac
                <!--Bike Unlocked-->
                <div  class="status" id="unlocked">
                     <!--Bike Number-->
-                    <p class="pNoMargin bikeNumber">0</p>
+                    <p class="pNoMargin bikeNumber" id="ubikeNum"></p>
                     <!--Bike Number text-->
                     <p class="pNoMargin bikeNumberText">Bike Number</p>
                     <!--Route-->

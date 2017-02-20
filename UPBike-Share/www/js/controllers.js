@@ -43,7 +43,7 @@ May 12, 2016 - Jaypee San Gabriel
 --> */
 angular.module('BikeShare.controllers', ['BikeShare.services'])
 
-    .controller('LoginCtrl', function ($scope, DatabaseService) {
+    /*.controller('LoginCtrl', function ($scope, DatabaseService) {
 		$scope.users=[];
 		
 		function getusers() {
@@ -63,5 +63,5 @@ angular.module('BikeShare.controllers', ['BikeShare.services'])
 				$scope.bikes=data;
 			});
         }
-	});
+	});*/
 

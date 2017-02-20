@@ -56,38 +56,40 @@ March 26, 2016 - Mark Anton Mamac
 <html>
      <head>
           <title>Home Screen</title>
+		  <script src="lib/angular/angular.js"></script>
+          <script src="lib/ionic/js/ionic.js"></script>
+          <script src="lib/angular-animate/angular-animate.js"></script>
+          <script src="lib/angular-sanitize/angular-sanitize.js"></script>
+          <script src="lib/angular-ui-router/release/angular-ui-router.js"></script>
+          <script src="lib/ionic/js/ionic-angular.js"></script>
+	      <script src="js/app.js"></script>
           <script>
-		       var users = [
-			        {"username":"gepree", "password":"blazedge"},
-					{"username":"eria", "password":"haven"},
-			        {"username":"astraea", "password":"blackblood"},
-               ];
 			   var bikes = [
 			        {"id":"1","state":"Available", "location":"Vinzon's"},
-					{"id":"2","state":"Available", "location":"Eng'g Lib 2"},
+					{"id":"2","state":"Reserved", "location":"Eng'g Lib 2"},
 			        {"id":"3","state":"Available", "location":"Eng'g Lib 2"},
                ];
 			   var ongoingshares = [
-			        {"user":"gepree", "bike":"2"}
+			        {"user":"gepree", "bike":"2"},
                ];
-			   var currentUser=localStorage.getItem("username");
-			   var reservedStation=localStorage.getItem("reserved");
-			   var objectCount = users.length;
+			   var currentUser=localStorage.getItem("currentuser");
+			   currentUser=JSON.parse(currentUser);
+			   /*var objectCount = users.length;
 			   for (var i=0; i < objectCount; i++){
 			        if (currentUser.localeCompare(users[i].username)==0){
 					     currentUser=users[i];
 						 break;
 				    }
-			   }
-               objectCount = ongoingshares.length;
+			   }*/
+               /*var objectCount = ongoingshares.length;
 			   for (i=0; i < objectCount; i++){
 					if (currentUser.username.localeCompare(ongoingshares[i].user)==0){
-						 reservedStation="Ongoing";
-						 localStorage.setItem("reserved",reservedStation);
-						 localStorage.setItem("bikenumber",ongoingshares[i].bike);
+					     currentUser.reservedstate="Ongoing";
+						 currentUser.bikenumber=ongoingshares[i].bike;
+						 localStorage.setItem("currentuser",JSON.stringify(currentUser));
 						 break;
 					}
-				}
+				}*/
                 /*
                iconClick() function
                March 16 2016
@@ -96,27 +98,33 @@ March 26, 2016 - Mark Anton Mamac
                */
                function iconClick(icon){
                     /*get the number of bikes available from the database*/
-					var availableBike=0;
-					var objectCount = bikes.length;
-			        for (var i=0; i < objectCount; i++){
-					     if (icon.name.localeCompare(bikes[i].location)==0){
-						      availableBike++;
-						 }
-					}
-                    var bikeNumber=document.getElementById("bikeNumber");
-                    bikeNumber.innerHTML=availableBike;
+					var dataPromise=angular.element(document.body).injector().get('Database').getBikes();
+					dataPromise.then(function(result){
+			             var bikes=result.data;
+						 var availableBike=0;
+					     var objectCount = bikes.length;
+			             for (var i=0; i < objectCount; i++){
+					          if (icon.name.localeCompare(bikes[i].location)==0){
+						           availableBike++;
+						      }
+					     }
+						 var bikeNumber=document.getElementById("bikeNumber");
+                         bikeNumber.innerHTML=availableBike;
+					},
+					function(result){
+					     alert('Unable to connect. Please check your connection.')
+					});
 					
                     /*If there is no reserved bike show the reservation popup*/
                     /*change the station name based on the clicked icon*/
-				
-                    if (reservedStation.localeCompare("None")==0){					
+                    if (currentUser.reservedstate.localeCompare("None")==0){
                          var stationName=document.getElementById("rpopUpStationName");
                          stationName.innerHTML=icon.name;
 					     document.getElementById("reservePopUp").popUpStationName=icon.name;
                          document.getElementById("reservePopUp").className="popUp homePopUp changeOpacity1";
                          document.getElementById("reservePopUp").style.pointerEvents="auto";
                     }
-					else {
+					else if (currentUser.reservedstate.localeCompare("GetDestination")==0){
 
                     /*Else if there is a reserved bike but the destination is not yet locked, show the destination popup*/
                     /*change the station name based on the clicked icon*/
@@ -127,6 +135,9 @@ March 26, 2016 - Mark Anton Mamac
                          document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity1";
                          document.getElementById("destinationPopUp").style.pointerEvents="auto";
                     }
+					else {
+					     alert("You have currently set a location and destination. Go to your status page (bike icon) to unlock/lock your bike.");
+					}
                }
 
                /*
@@ -136,18 +147,32 @@ March 26, 2016 - Mark Anton Mamac
                Saves the reservation location.
                */
                function reserve(){
-                    /*station name*/
-                    var stationName=document.getElementById("reservePopUp").popUpStationName;
-                    reservedStation=stationName;
-                    localStorage.setItem("reserved",reservedStation);
+			        var stationName=document.getElementById("reservePopUp").popUpStationName;
+					var dataPromise=angular.element(document.body).injector().get('Database').getBikes();
+					dataPromise.then(function(result){
+					     var bikes=result.data;
+			             var objectCount=bikes.length;
+                         for (var i=0; i < objectCount; i++){
+			                  if (stationName.localeCompare(bikes[i].location)==0){
+							       currentUser.bikenumber=bikes[i].id;
+						           break;
+				              }
+			             }
+						 if (currentUser.bikenumber==0){
+						      alert("There are no available bikes.");
+						 }
+						 else{
+						      alert("Reservation successful.");
+						                     /*station name*/
+					          currentUser.reservedstate="GetDestination";
+					          currentUser.reservestation=stationName;
+					          localStorage.setItem("currentuser",JSON.stringify(currentUser));
+						 }
+					},
+					function(result){
+					     alert('Unable to connect. Please check your connection.')
+					});
 					
-					var objectCount=bikes.length;
-                    for (var i=0; i < objectCount; i++){
-			             if (stationName.localeCompare(bikes[i].location)==0){
-					          localStorage.setItem("bikenumber",bikes[i].id);
-						      break;
-				         }
-			        }
                     /*hide reserve popup*/
                     document.getElementById("reservePopUp").className="popUp homePopUp changeOpacity0";
 					document.getElementById("reservePopUp").style.pointerEvents="none";
@@ -173,23 +198,22 @@ March 26, 2016 - Mark Anton Mamac
                */
                function lock(){
                     /*station name*/
-                    var stationName=document.getElementById("destinationPopUp").popUpStationName;
-					var objectCount = bikes.length;
-			        for (var i=0; i < objectCount; i++){
-					     if (reservedStation.localeCompare(bikes[i].location)==0){
-						      break;
-						 }
-					}
-					var lockedReservation=new share(currentUser.username,bikes[i].id);
-					ongoingshares.push(lockedReservation);
-					var objectCount = ongoingshares.length;
-					for (var i=0; i < objectCount; i++){
-					     alert(ongoingshares[i].user);
-					}
+					var dataPromise=angular.element(document.body).injector().get('Database').postOngoing(currentUser.userID,currentUser.bikenumber);
+					dataPromise.then(function(result){
+					     alert("Reservation successfully locked.");
+						 var stationName=document.getElementById("destinationPopUp").popUpStationName;
+					     currentUser.destination=stationName;
+					     currentUser.reservedstate="DestinationSet";
+					     localStorage.setItem("currentuser",JSON.stringify(currentUser));
+					},
+					function(result){
+					     alert('Unable to connect. Please check your connection.')
+					});
                     /*insert lock code here*/
 
                     /*hide reserve popup*/
                     document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity0";
+					document.getElementById("destinationPopUp").style.pointerEvents="none";
                }
 
                /*
@@ -204,29 +228,28 @@ March 26, 2016 - Mark Anton Mamac
                     document.getElementById("destinationPopUp").style.pointerEvents="none";
                }
 			   
-			   function share(user,bike) {
-			        this.user=user;
-					this.bike=bike;
-			   }
-			   
 			   /* check_reservation() function
-			   November 06,2016
+			   February 15, 2017
 			   
-			   Check for the reservation state of the user.
+			   Check if the user has an ongoing unlocked reservation.
 			   */
-			   /*function check_reservation(){
-					var reservedState;
-			        var objectCount = ongoingshares.length;
-			        for (var i=0; i < objectCount; i++){
-					     if (currentUser.username.localeCompare(ongoingshares[i].user)==0){
-						      reservedState=2;
-					     }
-					}
-					return reservedState;
-			   }*/
+			   function check_reservation(){
+					var dataPromise=angular.element(document.body).injector().get('Database').checkOngoing(currentUser.userID);
+					dataPromise.then(function(result){
+			             is_ongoing=result.data;
+						 if (is_ongoing==1){
+						      currentUser.reservedstate="Ongoing";
+							  localStorage.setItem("currentuser",JSON.stringify(currentUser));
+						 }
+					},
+					function(result){
+					     alert('Unable to connect. Please check your connection.')
+					});
+			   }
           </script>
      </head>
-     <body>
+     <body ng-app="BikeShare"></body>
+     <body onload="check_reservation()">
           <!--ionic css for preset designs-->
           <!--<link href="lib/ionic/css/ionic.css" rel="stylesheet">-->
 

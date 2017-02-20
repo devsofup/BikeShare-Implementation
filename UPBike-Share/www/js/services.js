@@ -51,7 +51,7 @@ April 14, 2016
 This service is for obtaining data from the Backand database.
 The code is obtained from: <no author>. Backand Documentation. Last accessed: April 14, 2016 
 */
-	.service('DatabaseService', function($http, Backand){    
+/*	.service('DatabaseService', function($http, Backand){    
 
 		 var baseUrl = '/1/objects/';
 
@@ -100,4 +100,4 @@ The code is obtained from: <no author>. Backand Documentation. Last accessed: Ap
 					});
 			}					
 		};
-	});
+	});*/
