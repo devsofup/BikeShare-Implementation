@@ -43,6 +43,9 @@ March 26, 2016 - Mark Anton Mamac
 ->Status <body>
 ->UI part of display(), unlock(), cancelReserve() and lock() function.
 
+February 15, 2017 - Jaypee San Gabriel
+->UI Display now changes to reflect more accurate information regarding user's current status.
+
 -->
 
 <html>
@@ -73,7 +76,6 @@ March 26, 2016 - Mark Anton Mamac
                document.getElementById("reserved").style.pointerEvents="auto";
 
                //display route based on reservation
-               //sample value only
 			   document.getElementById("rbikeNum").innerHTML=currentUser.bikenumber;
                document.getElementById("rRoute").innerHTML=currentUser.reservestation;
 			   }
@@ -84,7 +86,6 @@ March 26, 2016 - Mark Anton Mamac
                document.getElementById("reserved").style.pointerEvents="auto";
 
                //display route based on reservation
-               //sample value only
 			   document.getElementById("rbikeNum").innerHTML=currentUser.bikenumber;
                document.getElementById("rRoute").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
 			   
@@ -96,7 +97,6 @@ March 26, 2016 - Mark Anton Mamac
                document.getElementById("unlocked").style.pointerEvents="auto";
 
                //display route based on reservation
-               //sample value only
 			   document.getElementById("ubikeNum").innerHTML=currentUser.bikenumber;
                document.getElementById("route").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
 			   }
@@ -113,7 +113,6 @@ March 26, 2016 - Mark Anton Mamac
                document.getElementById("unlocked").style.pointerEvents="auto";
 
                //display route based on reservation
-               //sample value only
                document.getElementById("uRoute").innerHTML=currentUser.reservestation.concat(" - ").concat(currentUser.destination);
 			   
 			   currentUser.reservedstate="Ongoing";

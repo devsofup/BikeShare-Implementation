@@ -52,6 +52,8 @@ March 16, 2016 - Mark Anton Mamac
 March 18, 2016 - Mark Anton Mamac
 ->Change issue textbox from input text to textarea
 
+February 3, 2017 - Jaypee San Gabriel
+->submit function now properly uses a database
 -->
 
 <html>
@@ -76,9 +78,7 @@ March 18, 2016 - Mark Anton Mamac
                function submit(){
                     var bikeNumber=document.getElementById("bikeNumber").value;
                     var issue=document.getElementById("issue").value;
-					//var data_promise=angular.injector(['ng','BikeShare']).get('Database').postReport();
 					var dataPromise=angular.element(document.body).injector().get('Database').postReport(currentUser.userID,bikeNumber,issue);
-					//var data_promise=angular.element(document.getElementById('BikeShare')).injector().get('Database').postReport();
 					dataPromise.then(function(response){alert("Report successfully submitted.")},function(response){alert('Unable to connect. Please check your connection.')});
                     /*submit this values*/
                }

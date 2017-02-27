@@ -42,6 +42,15 @@ April 14, 2016 - Jaypee San Gabriel
 May 12, 2016 - Jaypee San Gabriel
 ->Changed AngularJS structure
 
+January 22, 2017 - Jaypee San Gabriel
+->Added a factory to serve as the database service provider
+
+January 27, 2017- Jaypee San Gabriel
+->Added getUsers, getBikes function
+
+February 13, 2017 - Jaypee San Gabriel
+->Added checkOngoing, postOngoing, postReport, deleteReport functions
+
 --> */
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
@@ -88,21 +97,11 @@ angular.module('BikeShare', ['ionic'])
 	      return $http.post(url,data);
      };
 	 
-	 /*var postReport=function(){
-	           alert('!!!');
-               return $http.get('http://localhost:8000/bikeshare/trypost.php');
-     };*/
 	 
      var postReport=function(userid,bikeNumber,issue){
 	      var url='http://localhost:8000/bikeshare/post_report.php';
 		  var data={"userid":userid.toString(),"bikeNumber":bikeNumber,"issue":issue};
 	      return $http.post(url,data);
-		  /*return $http({
-		       method: 'POST',
-		       url:'http://localhost:8000/bikeshare/trypost.php',
-		       data{'message':'abc'}
-		       })
-		       .then(function(response){alert('yay')},function(response){alert('nop')});*/
 	 };
 	 
 	 var deleteOngoing=function(userid){
@@ -118,17 +117,6 @@ angular.module('BikeShare', ['ionic'])
 		  postOngoing:postOngoing,
 		  postReport:postReport,
 		  deleteOngoing:deleteOngoing
-          /*getUsers: function(){
-               return $http.get('http://localhost:8000/bikeshare/get_user.php');
-          }*/
-		  /*postReport: function(){
-		       return $http({
-			        method: 'POST',
-					url:'http://localhost:8000/bikeshare/trypost.php',
-					data{'message':'abc'}
-					})
-					.then(function(response){alert('yay')},function(response){alert('nop')});
-          }*/
      };
 })
 

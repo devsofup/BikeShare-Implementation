@@ -50,6 +50,9 @@ October 10, 2016 - Jaypee San Gabriel
 ->Fixed login function to actually check for username and password combinations.
 ->Added code to transfer user data between pages.
 
+January 6, 2017 - Jaypee San Gabriel
+->login function now uses a database
+
 -->
 
 <html>
@@ -88,40 +91,31 @@ October 10, 2016 - Jaypee San Gabriel
                */
 
                function login(usr, pass){
-					var dataPromise=angular.element(document.body).injector().get('Database').getUsers();
-					dataPromise.then(function(result){
-			             var users=result.data;
-						 var objectCount = users.length;
-						 /*username input from the user*/
-						 var usr=document.getElementById("username").value;
-						 /*password input from the user*/
-						 var pass=document.getElementById("password").value;
-						 for (var i=0; i < objectCount; i++){
-						      if(usr.localeCompare(users[i].user_name)==0 && pass.localeCompare(users[i].encrypted_password)==0){
-						           alert("Login successful!");
-								   var currentUser={"username":usr,"userID":users[i].id,"reservedstate":"None","reservestation":"None","destination":"None","bikenumber":"0"};
-								   localStorage.setItem("currentuser",JSON.stringify(currentUser));
-						           location.href="home.html";
-						           return true;
-						      }
-
-							 
-						 }
-						 alert("Incorrect username and password combination!");
-						 return false;
-					},
-					function(result){
-					     alert('Unable to connect. Please check your connection.')
-					});
-			        /*var users = [
-			             {"username":"gepree", "password":"blazedge"},
-					     {"username":"eria", "password":"haven"},
-			             {"username":"astraea", "password":"blackblood"},
-                    ];*/
-                    /*username input from the user*/
-                    //var usr=document.getElementById("username").value;
-                    /*password input from the user*/
-                    //var pass=document.getElementById("password").value;
+                    var dataPromise=angular.element(document.body).injector().get('Database').getUsers();
+                    dataPromise.then(function(result){
+                         var users=result.data; /*database object*/
+                         var objectCount = users.length;
+                         /*username input from the user*/
+                         var usr=document.getElementById("username").value;
+                         /*password input from the user*/
+                         var pass=document.getElementById("password").value;
+                         /*check for result in database object*/
+                         for (var i=0; i < objectCount; i++){
+                              if(usr.localeCompare(users[i].user_name)==0 && pass.localeCompare(users[i].encrypted_password)==0){
+                                   alert("Login successful!");
+                                   /*Create a local object keeping track of certain states and data*/
+                                   var currentUser={"username":usr,"userID":users[i].id,"reservedstate":"None","reservestation":"None","destination":"None","bikenumber":"0"};
+                                   localStorage.setItem("currentuser",JSON.stringify(currentUser));
+                                   location.href="home.html";
+                                   return true;
+                              }		 
+                         }
+                         alert("Incorrect username and password combination!");
+                         return false;
+                    },
+                    function(result){
+                         alert('Unable to connect. Please check your connection.')
+                    });
                }
           </script>
      </head>

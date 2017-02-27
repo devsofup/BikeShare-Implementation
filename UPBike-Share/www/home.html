@@ -51,6 +51,9 @@ March 16, 2016 - Mark Anton Mamac
 March 26, 2016 - Mark Anton Mamac
 ->Additional station icons
 
+February 6, 2017 - Jaypee San Gabriel
+->iconClick, reserve, lock function now uses database.
+
 -->
 
 <html>
@@ -64,32 +67,8 @@ March 26, 2016 - Mark Anton Mamac
           <script src="lib/ionic/js/ionic-angular.js"></script>
 	      <script src="js/app.js"></script>
           <script>
-			   var bikes = [
-			        {"id":"1","state":"Available", "location":"Vinzon's"},
-					{"id":"2","state":"Reserved", "location":"Eng'g Lib 2"},
-			        {"id":"3","state":"Available", "location":"Eng'g Lib 2"},
-               ];
-			   var ongoingshares = [
-			        {"user":"gepree", "bike":"2"},
-               ];
-			   var currentUser=localStorage.getItem("currentuser");
-			   currentUser=JSON.parse(currentUser);
-			   /*var objectCount = users.length;
-			   for (var i=0; i < objectCount; i++){
-			        if (currentUser.localeCompare(users[i].username)==0){
-					     currentUser=users[i];
-						 break;
-				    }
-			   }*/
-               /*var objectCount = ongoingshares.length;
-			   for (i=0; i < objectCount; i++){
-					if (currentUser.username.localeCompare(ongoingshares[i].user)==0){
-					     currentUser.reservedstate="Ongoing";
-						 currentUser.bikenumber=ongoingshares[i].bike;
-						 localStorage.setItem("currentuser",JSON.stringify(currentUser));
-						 break;
-					}
-				}*/
+               var currentUser=localStorage.getItem("currentuser");
+               currentUser=JSON.parse(currentUser);
                 /*
                iconClick() function
                March 16 2016
@@ -209,7 +188,6 @@ March 26, 2016 - Mark Anton Mamac
 					function(result){
 					     alert('Unable to connect. Please check your connection.')
 					});
-                    /*insert lock code here*/
 
                     /*hide reserve popup*/
                     document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity0";
