@@ -79,7 +79,15 @@ February 3, 2017 - Jaypee San Gabriel
                     var bikeNumber=document.getElementById("bikeNumber").value;
                     var issue=document.getElementById("issue").value;
 					var dataPromise=angular.element(document.body).injector().get('Database').postReport(currentUser.userID,bikeNumber,issue);
-					dataPromise.then(function(response){alert("Report successfully submitted.")},function(response){alert('Unable to connect. Please check your connection.')});
+					dataPromise.then(function(response){
+					alert("Report successfully submitted.");
+					var dataPromise2=angular.element(document.body).injector().get('Database').updateBike(bikeNumber,"Unusable");
+					dataPromise2.then(function(result){
+						//alert("Reservation cancelled.");
+					},
+					function(result){
+					    alert('Unable to connect. Please check your connection.')
+					});},function(response){alert('Unable to connect. Please check your connection.')});
                     /*submit this values*/
                }
           </script>

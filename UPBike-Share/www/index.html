@@ -104,7 +104,7 @@ January 6, 2017 - Jaypee San Gabriel
                               if(usr.localeCompare(users[i].user_name)==0 && pass.localeCompare(users[i].encrypted_password)==0){
                                    alert("Login successful!");
                                    /*Create a local object keeping track of certain states and data*/
-                                   var currentUser={"username":usr,"userID":users[i].id,"reservedstate":"None","reservestation":"None","destination":"None","bikenumber":"0"};
+                                   var currentUser={"username":usr,"userID":users[i].id,"reservedstate":"None","reservestation":"None","destination":"None","bikenumber":0};
                                    localStorage.setItem("currentuser",JSON.stringify(currentUser));
                                    location.href="home.html";
                                    return true;

@@ -78,34 +78,46 @@ angular.module('BikeShare', ['ionic'])
 .factory('Database', function($http) {
      var users=[];
 	 var getUsers=function(){
-               return $http.get('http://localhost:8000/bikeshare/get_user.php');
+               return $http.get('http://192.168.0.106:8000/bikeshare/get_user.php');
      };
 	 
 	 var getBikes=function(){
-               return $http.get('http://localhost:8000/bikeshare/get_bikes.php');
+               return $http.get('http://192.168.0.106:8000/bikeshare/get_bikes.php');
      };
 	 
+	 var updateBike=function(bikeNumber,status){
+	      var url='http://192.168.0.106:8000/bikeshare/update_bike.php';
+		  var data={"bikeNumber":bikeNumber.toString(),"status":status};
+		  return $http.post(url,data);
+	 };
+	 
+	 var updateBikeLocation=function(bikeNumber,location){
+	      var url='http://192.168.0.106:8000/bikeshare/update_location.php';
+		  var data={"bikeNumber":bikeNumber.toString(),"location":location};
+          return $http.post(url,data);
+	 };
+	 
 	 var checkOngoing=function(userid){
-	      var url='http://localhost:8000/bikeshare/check_ongoing.php';
+	      var url='http://192.168.0.106:8000/bikeshare/check_ongoing.php';
 		  var data={"userid":userid.toString()};
 	      return $http.post(url,data);
      };
 	 
 	 var postOngoing=function(userid,bikeNumber){
-	      var url='http://localhost:8000/bikeshare/post_ongoing.php';
+	      var url='http://192.168.0.106:8000/bikeshare/post_ongoing.php';
 		  var data={"userid":userid.toString(),"bikeNumber":bikeNumber.toString()};
 	      return $http.post(url,data);
      };
 	 
 	 
      var postReport=function(userid,bikeNumber,issue){
-	      var url='http://localhost:8000/bikeshare/post_report.php';
+	      var url='http://192.168.0.106:8000/bikeshare/post_report.php';
 		  var data={"userid":userid.toString(),"bikeNumber":bikeNumber,"issue":issue};
 	      return $http.post(url,data);
 	 };
 	 
 	 var deleteOngoing=function(userid){
-	      var url='http://localhost:8000/bikeshare/delete_ongoing.php';
+	      var url='http://192.168.0.106:8000/bikeshare/delete_ongoing.php';
 		  var data={"userid":userid.toString()};
 	      return $http.post(url,data);
      };
@@ -113,6 +125,8 @@ angular.module('BikeShare', ['ionic'])
      return {
 	      getUsers:getUsers,
 		  getBikes:getBikes,
+		  updateBike:updateBike,
+		  updateBikeLocation:updateBikeLocation,
 		  checkOngoing:checkOngoing,
 		  postOngoing:postOngoing,
 		  postReport:postReport,

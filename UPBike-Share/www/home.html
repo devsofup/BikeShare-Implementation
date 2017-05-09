@@ -69,6 +69,7 @@ February 6, 2017 - Jaypee San Gabriel
           <script>
                var currentUser=localStorage.getItem("currentuser");
                currentUser=JSON.parse(currentUser);
+			   alert("Welcome! Please choose a station to reserve a bike from.");
                 /*
                iconClick() function
                March 16 2016
@@ -141,7 +142,13 @@ February 6, 2017 - Jaypee San Gabriel
 						      alert("There are no available bikes.");
 						 }
 						 else{
-						      alert("Reservation successful.");
+							  var dataPromise2=angular.element(document.body).injector().get('Database').updateBike(currentUser.bikenumber,"Reserved");
+							  dataPromise2.then(function(result){
+							       alert("Reservation successful. Next, choose your destination.");
+							  },
+							  function(result){
+					               alert('Unable to connect. Please check your connection.')
+					          });
 						                     /*station name*/
 					          currentUser.reservedstate="GetDestination";
 					          currentUser.reservestation=stationName;
@@ -177,17 +184,11 @@ February 6, 2017 - Jaypee San Gabriel
                */
                function lock(){
                     /*station name*/
-					var dataPromise=angular.element(document.body).injector().get('Database').postOngoing(currentUser.userID,currentUser.bikenumber);
-					dataPromise.then(function(result){
-					     alert("Reservation successfully locked.");
-						 var stationName=document.getElementById("destinationPopUp").popUpStationName;
-					     currentUser.destination=stationName;
-					     currentUser.reservedstate="DestinationSet";
-					     localStorage.setItem("currentuser",JSON.stringify(currentUser));
-					},
-					function(result){
-					     alert('Unable to connect. Please check your connection.')
-					});
+					alert("Reservation successfully locked. Proceed to status screen (bike icon) to unlock your bike.");
+					var stationName=document.getElementById("destinationPopUp").popUpStationName;
+					currentUser.destination=stationName;
+				    currentUser.reservedstate="DestinationSet";
+					localStorage.setItem("currentuser",JSON.stringify(currentUser));
 
                     /*hide reserve popup*/
                     document.getElementById("destinationPopUp").className="popUp homePopUp changeOpacity0";
@@ -249,9 +250,9 @@ February 6, 2017 - Jaypee San Gabriel
                     <!--CHK station icon-->
                     <img src="img/stationIcon.png" name="CHK" alt="CHK Station" class="stationIcon chkIcon" onclick="iconClick(this)">
                     <!--Engg station icon-->
-                    <img src="img/stationIcon.png" name="Eng'g" alt="Engg Station" class="stationIcon enggIcon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Engg" alt="Engg Station" class="stationIcon enggIcon" onclick="iconClick(this)">
                     <!--EnggLib2 station icon-->
-                    <img src="img/stationIcon.png" name="Eng'g Lib 2" alt="EnggLib2 Station" class="stationIcon enggLib2Icon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Engg Lib 2" alt="EnggLib2 Station" class="stationIcon enggLib2Icon" onclick="iconClick(this)">
                     <!--Fine Arts station icon-->
                     <img src="img/stationIcon.png" name="Fine Arts" alt="Fine Arts Station" class="stationIcon fineArtsIcon" onclick="iconClick(this)">
                     <!--Marine Science station icon-->
@@ -271,7 +272,7 @@ February 6, 2017 - Jaypee San Gabriel
                     <!--Shopping Center station icon-->
                     <img src="img/stationIcon.png" name="Shopping Center" alt="Shopping Center Station" class="stationIcon shoppingCenterIcon" onclick="iconClick(this)">
                     <!--Vinzon's Hall station icon-->
-                    <img src="img/stationIcon.png" name="Vinzon's" alt="Vinzon's Station" class="stationIcon vinzonIcon" onclick="iconClick(this)">
+                    <img src="img/stationIcon.png" name="Vinzons" alt="Vinzon's Station" class="stationIcon vinzonIcon" onclick="iconClick(this)">
                </div>
 
                <!--Menu bar-->

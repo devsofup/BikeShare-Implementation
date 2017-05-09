@@ -72,12 +72,12 @@ February 15, 2017 - Jaypee San Gabriel
                /*else if there is reservation*/
 			   else if (currentUser.reservedstate.localeCompare("GetDestination")==0) {
                //show div reserved
-               document.getElementById("reserved").className="changeOpacity1";
-               document.getElementById("reserved").style.pointerEvents="auto";
+               document.getElementById("halfReserved").className="changeOpacity1";
+               document.getElementById("halfReserved").style.pointerEvents="auto";
 
                //display route based on reservation
-			   document.getElementById("rbikeNum").innerHTML=currentUser.bikenumber;
-               document.getElementById("rRoute").innerHTML=currentUser.reservestation;
+			   document.getElementById("hbikeNum").innerHTML=currentUser.bikenumber;
+               document.getElementById("hRoute").innerHTML=currentUser.reservestation;
 			   }
 			   
 			   else if (currentUser.reservedstate.localeCompare("DestinationSet")==0){
@@ -104,9 +104,26 @@ February 15, 2017 - Jaypee San Gabriel
           }
 
           function unlock(){
+		       document.getElementById("ubikeNum").innerHTML=currentUser.bikenumber;
+		       var dataPromise=angular.element(document.body).injector().get('Database').postOngoing(currentUser.userID,currentUser.bikenumber);
+				dataPromise.then(function(result){
+					 var dataPromise2=angular.element(document.body).injector().get('Database').updateBike(currentUser.bikenumber,"In Use");
+					 dataPromise2.then(function(result){
+						  alert("Bike is now in use.");
+					 },
+					 function(result){
+						  alert('Unable to connect. Please check your connection.')
+					 });
+			   },
+			   function(result){
+					 alert('Unable to connect. Please check your connection.')
+			   });
                //hide div reserved
                document.getElementById("reserved").className="changeOpacity0";
                document.getElementById("reserved").style.pointerEvents="none";
+			   
+			   document.getElementById("halfReserved").className="changeOpacity0";
+               document.getElementById("halfReserved").style.pointerEvents="none";
 
                //show div unlocked
                document.getElementById("unlocked").className="changeOpacity1";
@@ -122,17 +139,29 @@ February 15, 2017 - Jaypee San Gabriel
           function cancelReserve(){
 			   var dataPromise=angular.element(document.body).injector().get('Database').deleteOngoing(currentUser.userID);
 			   dataPromise.then(function(result){
+			        var dataPromise2=angular.element(document.body).injector().get('Database').updateBike(currentUser.bikenumber,"Available");
+					dataPromise2.then(function(result){
+						//alert("Reservation cancelled.");
+					},
+					function(result){
+					    alert('Unable to connect. Please check your connection.')
+					});
 			        //hide div reserved
                     document.getElementById("reserved").className="changeOpacity0";
                     document.getElementById("reserved").style.pointerEvents="none";
+					
+					document.getElementById("halfReserved").className="changeOpacity0";
+                    document.getElementById("halfReserved").style.pointerEvents="none";
 
                     //show div notReserved
                     document.getElementById("notReserved").className="changeOpacity1";
                     document.getElementById("notReserved").style.pointerEvents="auto";
 			   
+			   
 			        currentUser.reservedstate="None";
 			        currentUser.reservestation="None";
 			        currentUser.destination="None";
+					currentUser.bikenumber=0;
 			        localStorage.setItem("currentuser",JSON.stringify(currentUser));
 			   },
 			   function(result){
@@ -145,6 +174,20 @@ February 15, 2017 - Jaypee San Gabriel
 			   /* delete ongoing share */
 			   var dataPromise=angular.element(document.body).injector().get('Database').deleteOngoing(currentUser.userID);
 			   dataPromise.then(function(result){
+			        var dataPromise2=angular.element(document.body).injector().get('Database').updateBike(currentUser.bikenumber,"Available");
+					dataPromise2.then(function(result){
+						alert("Bike locked.");
+					},
+					function(result){
+					    alert('Unable to connect. Please check your connection.')
+					});
+					var dataPromise3=angular.element(document.body).injector().get('Database').updateBikeLocation(currentUser.bikenumber,currentUser.destination);
+					dataPromise3.then(function(result){
+						//alert("Location updated.");
+					},
+					function(result){
+					    alert('Unable to connect. Please check your connection.')
+					});
 					//hide div unlocked
                     document.getElementById("unlocked").className="changeOpacity0";
                     document.getElementById("unlocked").style.pointerEvents="none";
@@ -157,6 +200,7 @@ February 15, 2017 - Jaypee San Gabriel
 			        currentUser.reservedstate="None";
 			        currentUser.reservestation="None";
 			        currentUser.destination="None";
+					currentUser.bikenumber=0;
 			        localStorage.setItem("currentuser",JSON.stringify(currentUser));
 			   },
 			   function(result){
@@ -179,6 +223,17 @@ February 15, 2017 - Jaypee San Gabriel
                <div class="status" id="notReserved">
                     <!--No Bike Reservation text-->
                     <p class="pNoMargin noBikeReserved">No<br>Bike<br>Reserved</p>
+               </div>
+			   <!--With bike reservation, no destination-->
+               <div class="status" id="halfReserved">
+                    <!--Bike Number-->
+                    <p class="pNoMargin bikeNumber" id="hbikeNum"></p>
+                    <!--Bike Number text-->
+                    <p class="pNoMargin bikeNumberText">Bike Number</p>
+                    <!--Route-->
+                    <p class="pNoMargin route" id="hRoute"></p>
+                    <!--Cancel reservation button-->
+                    <input type="button" value="Cancel Reservation" class="button cancelReserve" onclick="cancelReserve()">
                </div>
                <!--With bike reservation-->
                <div class="status" id="reserved">
